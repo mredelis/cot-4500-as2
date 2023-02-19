@@ -112,16 +112,13 @@ def hermite_interpolation(x_points, y_points, slopes):
     for x in range(1, num_of_points * 2, 2):
         matrix[x][2] = slopes[int(x / 2)]
 
-    print()
-    print("Prefilled matrix: \n", matrix)
     filled_matrix = apply_div_dif(matrix)
-    # print(filled_matrix)
+    print()
+    print(filled_matrix)
 
 
 def apply_div_dif(matrix: np.array):
     size = len(matrix)
-    print("Length of matrix: ", size)
-    print()
 
     for i in range(2, size):
         for j in range(2, i + 2):
@@ -129,30 +126,22 @@ def apply_div_dif(matrix: np.array):
             if j >= len(matrix[i]) or matrix[i][j] != 0:
                 continue
 
-            print("i and j values: ", i, j)
             # get left cell entry
             left: float = matrix[i][j - 1]
-            print("left value: ", left)
 
             # get diagonal left entry
             diagonal_left: float = matrix[i - 1][j - 1]
-            print("Diagonal left: ", diagonal_left)
 
             # order of numerator is SPECIFIC.
             numerator: float = left - diagonal_left
 
             # denominator is current i's x_val minus the starting i's x_val....
-            print("matrix[i][0]: ", matrix[i][0])
-            print("matrix[i-2][0]: ", matrix[i - 2][0])
-            denominator = matrix[i][0] - matrix[i - 2][0]
+            denominator = matrix[i][0] - matrix[i - j + 1][0]
 
             # something save into matrix
             operation = numerator / denominator
-            print("Operation: ", operation)
-            print()
             matrix[i][j] = operation
 
-    print(matrix)
     return matrix
 
 
