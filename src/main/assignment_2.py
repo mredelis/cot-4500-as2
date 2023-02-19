@@ -91,6 +91,71 @@ def get_approximate_result(matrix, x_points, value):
     return reoccuring_px_result
 
 
+# 4. Divided difference method, Hermite polynomial approximation
+def hermite_interpolation(x_points, y_points, slopes):
+    # matrix size changes because of "doubling" up info for hermite
+    num_of_points = len(x_points)
+    matrix = np.zeros((num_of_points * 2, num_of_points * 2))
+
+    # populate x values (make sure to fill every TWO rows)
+    for x in range(0, num_of_points * 2, 2):
+        matrix[x][0] = x_points[int(x / 2)]
+        matrix[x + 1][0] = x_points[int(x / 2)]
+        # break
+
+    # prepopulate y values (make sure to fill every TWO rows)
+    for x in range(0, num_of_points * 2, 2):
+        matrix[x][1] = y_points[int(x / 2)]
+        matrix[x + 1][1] = y_points[int(x / 2)]
+
+    # prepopulate with derivates (make sure to fill every TWO rows. starting row CHANGES.)
+    for x in range(1, num_of_points * 2, 2):
+        matrix[x][2] = slopes[int(x / 2)]
+
+    print()
+    print("Prefilled matrix: \n", matrix)
+    filled_matrix = apply_div_dif(matrix)
+    # print(filled_matrix)
+
+
+def apply_div_dif(matrix: np.array):
+    size = len(matrix)
+    print("Length of matrix: ", size)
+    print()
+
+    for i in range(2, size):
+        for j in range(2, i + 2):
+            # skip if value is prefilled (we dont want to accidentally recalculate...)
+            if j >= len(matrix[i]) or matrix[i][j] != 0:
+                continue
+
+            print("i and j values: ", i, j)
+            # get left cell entry
+            left: float = matrix[i][j - 1]
+            print("left value: ", left)
+
+            # get diagonal left entry
+            diagonal_left: float = matrix[i - 1][j - 1]
+            print("Diagonal left: ", diagonal_left)
+
+            # order of numerator is SPECIFIC.
+            numerator: float = left - diagonal_left
+
+            # denominator is current i's x_val minus the starting i's x_val....
+            print("matrix[i][0]: ", matrix[i][0])
+            print("matrix[i-2][0]: ", matrix[i - 2][0])
+            denominator = matrix[i][0] - matrix[i - 2][0]
+
+            # something save into matrix
+            operation = numerator / denominator
+            print("Operation: ", operation)
+            print()
+            matrix[i][j] = operation
+
+    print(matrix)
+    return matrix
+
+
 # Q1 setup
 x_points = [3.6, 3.8, 3.9]
 y_points = [1.675, 1.436, 1.318]
@@ -106,6 +171,14 @@ divided_table = divided_difference_table(xi, fxi)
 approximating_x = 7.3
 final_approximation = get_approximate_result(divided_table, xi, approximating_x)
 
+# Q4 setup
+xi_points = [3.6, 3.8, 3.9]
+yi_points = [1.675, 1.436, 1.318]
+slopes = [-1.195, -1.188, -1.182]
+# xi_points = [1.3, 1.6, 1.9]
+# yi_points = [0.6200860, 0.4554022, 0.2818186]
+# slopes = [-0.5220232, -0.5698959, -0.5811571]
+hermite_interpolation(xi_points, yi_points, slopes)
 
-# 4. Divided difference method
+
 # 5. Cubic spline interpolation
