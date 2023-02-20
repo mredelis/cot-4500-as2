@@ -145,6 +145,57 @@ def apply_div_dif(matrix: np.array):
     return matrix
 
 
+# 5. Cubic spline interpolation
+def create_matrix_A(x_points):
+    n: int = len(x_points)
+
+    matrix_main_diagonal = np.identity(n)
+
+    h = []
+    for i in range(n - 1):
+        h.append(x_points[i + 1] - x_points[i])
+
+    # Fill in diagonal
+    for i in range(1, n - 1):
+        for j in range(1, n):
+            if i == j:
+                matrix_main_diagonal[i][j] = 2 * (h[i] + h[i - 1])
+
+    below_diagonal = h.copy()
+    above_diagonal = h.copy()
+
+    # Replace last element of below_diagonal with 0
+    below_diagonal[-1] = 0
+
+    # Replace first element of above_diagonal with 0
+    above_diagonal[0] = 0
+
+    matrix_below = np.diagflat(below_diagonal, -1)
+    matrix_above = np.diagflat(above_diagonal, 1)
+
+    matrix = matrix_main_diagonal + matrix_below + matrix_above
+    print()
+    print(matrix)
+
+    return h, matrix
+
+
+def create_vector_b(y_points, h_list):
+    # This not necessary but to keep consistency with textbook variables
+    a_list = y_points.copy()
+
+    n = len(y_points)
+
+    alpha = np.zeros(n)
+    for i in range(1, n - 1):
+        alpha[i] = 3 / h_list[i] * (a_list[i + 1] - a_list[i]) - 3 / h_list[i - 1] * (a_list[i] - a_list[i - 1])
+
+    print()
+    print(alpha)
+
+    return alpha
+
+
 # Q1 setup
 x_points = [3.6, 3.8, 3.9]
 y_points = [1.675, 1.436, 1.318]
@@ -169,5 +220,8 @@ slopes = [-1.195, -1.188, -1.182]
 # slopes = [-0.5220232, -0.5698959, -0.5811571]
 hermite_interpolation(xi_points, yi_points, slopes)
 
-
-# 5. Cubic spline interpolation
+# Q5 setup
+xi_p = [2, 5, 8, 10]
+fxi_p = [3, 5, 7, 9]
+h_list, matrix_A = create_matrix_A(xi_p)
+b_vector = create_vector_b(fxi_p, h_list)
