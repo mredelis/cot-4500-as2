@@ -28,7 +28,6 @@ def nevilles_method(x_points, y_points, x):
             # print("Coefficient", coefficient)
             matrix[i][j] = coefficient
 
-    # print(matrix)
     print(matrix[i][j])
     return None
 
@@ -60,8 +59,7 @@ def divided_difference_table(x_points, y_points):
     for i in range(1, size):
         diagonal.append(matrix[i][i])
 
-    print()
-    print(diagonal)
+    print(f"\n{diagonal}")
 
     return matrix
 
@@ -86,8 +84,7 @@ def get_approximate_result(matrix, x_points, value):
         reoccuring_px_result += mult_operation
 
     # final result
-    print()
-    print(reoccuring_px_result)
+    print(f"\n{reoccuring_px_result}")
     return reoccuring_px_result
 
 
@@ -113,8 +110,7 @@ def hermite_interpolation(x_points, y_points, slopes):
         matrix[x][2] = slopes[int(x / 2)]
 
     filled_matrix = apply_div_dif(matrix)
-    print()
-    print(filled_matrix)
+    print(f"\n{filled_matrix}")
 
 
 def apply_div_dif(matrix: np.array):
@@ -174,8 +170,7 @@ def create_matrix_A(x_points):
     matrix_above = np.diagflat(above_diagonal, 1)
 
     matrix = matrix_main_diagonal + matrix_below + matrix_above
-    print()
-    print(matrix)
+    print(f"\n{matrix}")
 
     return h, matrix
 
@@ -190,10 +185,41 @@ def create_vector_b(y_points, h_list):
     for i in range(1, n - 1):
         alpha[i] = 3 / h_list[i] * (a_list[i + 1] - a_list[i]) - 3 / h_list[i - 1] * (a_list[i] - a_list[i - 1])
 
-    print()
-    print(alpha)
+    print(f"\n{alpha}")
 
     return alpha
+
+
+def create_x_vector(x_points, h_list, b_vector):
+    # Step 3 page 150
+    n = len(x_points)
+    l = np.zeros(n)
+    u = np.zeros(n)
+    z = np.zeros(n)
+    c = np.zeros(n)
+
+    l[0] = 1
+    # Not necessary u and z arrays are 0 on their first element
+    # u[0] = 0
+    # z[0] = 0
+
+    # Step 4
+    for i in range(1, n - 1):
+        l[i] = 2 * (x_points[i + 1] - x_points[i - 1]) - (h_list[i - 1] * u[i - 1])
+        u[i] = h_list[i] / l[i]
+        z[i] = (b_vector[i] - h_list[i - 1] * z[i - 1]) / l[i]
+
+    # Step 5
+    l[n - 1] = 1
+    z[n - 1] = 0
+    c[n - 1] = 0
+
+    for j in range(n - 2, 0, -1):
+        c[j] = z[j] - u[j] * c[j + 1]
+
+    print(f"\n{c}\n")
+
+    return c
 
 
 # Q1 setup
@@ -225,3 +251,4 @@ xi_p = [2, 5, 8, 10]
 fxi_p = [3, 5, 7, 9]
 h_list, matrix_A = create_matrix_A(xi_p)
 b_vector = create_vector_b(fxi_p, h_list)
+x_vector = create_x_vector(xi_p, h_list, b_vector)
