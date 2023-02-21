@@ -16,4 +16,4 @@ For more information about the `requirements.txt` file: https://learnpython.com/
 2. how to run assignment_2.py from the command line
 
 - cd to the file location: from the root directory `cd scr/main`
-- In the command line type `assignment_2.py` to run the program
+- In the command line type `python assignment_2.py` to run the program
